@@ -1,11 +1,11 @@
-require('dotenv').config();
+import dotenv from 'dotenv'
 import mongoose from "mongoose";
 import express from "express";
 import cors from "cors";
 import { Authenticate } from "./middleware/auth.js";
 // hardcoded configuration; not using dotenv
 // import dotenv from "dotenv";
-// dotenv.config();
+dotenv.config();
 
 import authRoute from "./routes/authRoute.js";
 import todoRoute from "./routes/todoRoute.js";
