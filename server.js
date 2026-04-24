@@ -22,13 +22,13 @@ app.use(express.json());
 async function main() {
 
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        await mongoose.connect(process.env.MONGODB_URI);
         console.log("database name is", mongoose.connection.name);
         console.log("database host is", mongoose.connection.host);
         console.log("database port is", mongoose.connection.port);
         console.log("database state is", mongoose.connection.readyState);
 
-        const PORT = 3000;
+        const PORT = process.env.PORT || 3000;
         app.listen(PORT, () => {
             console.log("EXPRESS SERVER RUNNING AT", PORT);
         })

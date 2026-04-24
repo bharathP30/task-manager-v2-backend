@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const SECRET_KEY = "my_secret_key_is_safe";
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 export const Authenticate = async (req, res, next) => {
     try {
@@ -18,7 +18,7 @@ export const Authenticate = async (req, res, next) => {
             return res.status(401).json({ error: "There is no token in the header. Invalid Token" });
         }
 
-        const decodedData = jwt.verify(token, SECRET_KEY);
+        const decodedData = jwt.verify(token, JWT_SECRET_KEY);
 
         req.userId = decodedData.userId;
         req.email = decodedData.email;
@@ -42,6 +42,6 @@ export const generateToken = (userId, email, rememberMe) => {
     };
 
     const date = rememberMe? "30d" : "7d";
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: date });
+    const token = jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: date });
     return token;
 }
