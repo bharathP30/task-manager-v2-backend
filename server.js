@@ -22,7 +22,7 @@ app.use(express.json());
 async function main() {
 
     try {
-        await mongoose.connect(process.env.MONGODB_URI);
+        await mongoose.connect(process.env.MONGODB_URL);
         console.log("database name is", mongoose.connection.name);
         console.log("database host is", mongoose.connection.host);
         console.log("database port is", mongoose.connection.port);
