@@ -18,7 +18,7 @@ export const Authenticate = async (req, res, next) => {
 
         const payload = jwt.verify(token, JWT_SECRET_KEY);
 
-        req.userId = payload.userId;
+        req.userId = payload.sub;
         req.email = payload.email;
         next();
         
