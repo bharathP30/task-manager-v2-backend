@@ -15,7 +15,7 @@ router.post("/signup", async (req, res) => {
         const existingUser = await User.findOne({ email: email });
 
         if (existingUser) {
-            return res.status(401).json({ error: "user already exists, login instead" });
+            return res.status(409).json({ error: "user already exists, login instead" });
         }
 
         const newUser = await User.create({
@@ -27,9 +27,12 @@ router.post("/signup", async (req, res) => {
 
 
         if (newUser) {
-            const token = generateToken(newUser._id, newUser.email, rememberMe);
+            const payLoad = { userId: newUser._id, email: newUser.email };
+            const token = generateToken( payLoad, rememberMe );
             console.log("generated token received", token);
-            return res.json({ message: "User created successfully", user: newUser, token: token });
+            return res.json({   message: "User created successfully", 
+                                user: { _id: newUser._id, name: newUser.name, email: newUser.email }, 
+                                token });
         }
 
     } catch (error) {
@@ -42,9 +45,7 @@ router.post("/login", async (req, res) => {
         console.log("login api is running")
         const { email, password, rememberMe } = req.body;
 
-
         const existingUser = await User.findOne({ email: email });
-
 
         if (!existingUser) return res.status(404).json({ error: "user does not exist, signup instead" });
 
@@ -55,17 +56,19 @@ router.post("/login", async (req, res) => {
         console.log(isPassTrue);
 
         if (!isPassTrue) {
-            return res.status(404).json({ error: "password does not match" });
+            return res.status(401).json({ error: "password does not match" });
         }
-
-        const token = generateToken(existingUser._id, existingUser.email, rememberMe);
+        const payLoad = { userId: existingUser._id, email: existingUser.email };
+        const token = generateToken(payLoad._id, existingUser.email, rememberMe);
 
         console.log("generated token received");
 
-        return res.json({ message: "Login successfull", user: existingUser, token });
+        return res.json({   message: "Login successful", 
+                            user: { _id: existingUser._id, name: existingUser.name, email: existingUser.email },
+                            token  });
 
     } catch (error) {
-        res.status(500).json({ error: "failed to signup" })
+        res.status(500).json({ error: "failed to login" })
     }
 });
 

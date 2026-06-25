@@ -4,24 +4,22 @@ const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 export const Authenticate = async (req, res, next) => {
     try {
-        const authHeaderToken = req.headers.authorization;
+        const authHeader = req.headers.authorization;
 
-        if (!authHeaderToken) {
-            console.log("Auth middleware: No authorization header provided");
-            return res.status(404).json({ error: "Token not provided" });
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({ error: "Missing or invalid Authorization header" });
         }
 
-        const token = authHeaderToken.split(" ")[1];
+        const token = authHeader.split(" ")[1];
 
         if (!token) {
-            console.log("Auth middleware: Token split failed - no token after 'Bearer' in header");
             return res.status(401).json({ error: "There is no token in the header. Invalid Token" });
         }
 
-        const decodedData = jwt.verify(token, JWT_SECRET_KEY);
+        const payload = jwt.verify(token, JWT_SECRET_KEY);
 
-        req.userId = decodedData.userId;
-        req.email = decodedData.email;
+        req.userId = payload.userId;
+        req.email = payload.email;
         next();
         
     } catch (error) {
@@ -29,16 +27,14 @@ export const Authenticate = async (req, res, next) => {
             console.log("Auth middleware: Token has expired");
             return res.status(401).json({ error: "Error: Expired Token" });
         }
-        console.log("Auth middleware: Other JWT verification error -", error.message);
-        return res.status(500).json({ message: "Invalid Token" });
+        return res.status(401).json({ message: "Invalid Token" });
     }
 }
 
-export const generateToken = (userId, email, rememberMe) => {
-    console.log("running generatedToken");
-
+export const generateToken = ( payLoad, rememberMe ) => {
     const payload = {
-        userId, email
+        sub: payLoad.userId,
+        email: payLoad.email
     };
 
     const date = rememberMe? "30d" : "7d";

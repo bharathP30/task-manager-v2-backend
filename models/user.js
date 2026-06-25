@@ -8,7 +8,8 @@ const userSchema = mongoose.Schema({
     },
     email: {
         type: String,
-        required: true
+        required: true,
+        unique:true
     },
     password: {
         type: String,
@@ -21,9 +22,9 @@ const userSchema = mongoose.Schema({
     timestamps: true
 });
 
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
     if (!this.isModified("password")) {
-        return next();
+        return;
     }
     this.password = await bcrypt.hash(this.password, 10);
 });
