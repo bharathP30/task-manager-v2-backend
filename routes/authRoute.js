@@ -59,7 +59,7 @@ router.post("/login", async (req, res) => {
             return res.status(401).json({ error: "password does not match" });
         }
         const payLoad = { userId: existingUser._id, email: existingUser.email };
-        const token = generateToken(payLoad._id, existingUser.email, rememberMe);
+        const token = generateToken( payLoad, rememberMe);
 
         console.log("generated token received");
 
