@@ -7,7 +7,7 @@ router.get("/filter", async (req, res) => {
     const { category, priority, completed, search } = req.query;
     const filter = { userId: req.userId };
 
-    if (category) filter.category = category;
+    if (category) filter.category = String(category);
     if (priority) filter.priority= priority;
     if (completed) filter.completed = completed === "true"; // convert string to boolean
     if (search) filter.taskContent = { $regex: search, $options: "i" }; // case-insensitive search
@@ -73,17 +73,19 @@ router.post("/", async (req, res) => {
 
 router.patch("/:id", async (req, res) => {
     try {
-        const updated = await Todo.findOneAndUpdate(
+        // whitelist data to exclude userId from req body
+        const { taskContent, category, priority, dueDate, completed } = req.body;
+        const toUpdateTodo = await Todo.findOneAndUpdate(
             { userId: req.userId, _id: req.params.id },
-            { $set: req.body },
+            { $set: { taskContent, category, priority, dueDate, completed } },
             { returnDocument: 'after' }
         );
 
-        if (!updated) {
+        if (!toUpdateTodo) {
             return res.status(404).json({ error: "No todo found" });
         }
 
-        return res.status(200).json(updated);
+        return res.status(200).json(toUpdateTodo);
     } catch (error) {
         return res.status(500).json({ error: "failed to update todo" });
     }
@@ -91,11 +93,9 @@ router.patch("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
     try {
-        console.log(req.userId, req.params.id)
-        const deleted = await Todo.findOneAndDelete({ userId: req.userId, _id: req.params.id });
-         console.log("selected to delete is,", deleted);
-
-        if (!deleted) {
+        const toDeleteTodo = await Todo.findOneAndDelete({ userId: req.userId, _id: req.params.id });
+        
+        if (!toDeleteTodo) {
             return res.status(404).json({ error: "No todo found" });
         }
 

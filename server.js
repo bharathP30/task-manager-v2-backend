@@ -2,12 +2,12 @@ import dotenv from 'dotenv'
 import mongoose from "mongoose";
 import express from "express";
 import cors from "cors";
-import { Authenticate } from "./middleware/auth.js";
-// import dotenv from "dotenv";
-dotenv.config();
 
+import { Authenticate } from "./middleware/auth.js";
 import authRoute from "./routes/authRoute.js";
 import todoRoute from "./routes/todoRoute.js";
+
+dotenv.config();
 
 const app = express();
 app.use(cors({
@@ -18,7 +18,23 @@ app.use(express.json());
 // hardcoded DB URL as before
 //const DB_URL = "mongodb://localhost:27017/todos";   
 
-async function main() {
+app.use("/api/auth", authRoute);
+app.use("/api/todos", Authenticate, todoRoute);
+
+
+app.get("/", (req, res) => {
+    res.json({
+        message: "CONNECTED",
+    })
+})
+
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({ error: err.message || "Something went wrong" });
+});
+
+
+const main = async function () {
 
     try {
         await mongoose.connect(process.env.MONGODB_URL);
@@ -39,17 +55,4 @@ async function main() {
 }
 main();
 
-app.get("/", (req, res) => {
-    res.json({
-        message: "CONNECTED",
-    })
-})
-
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(err.status || 500).json({ error: err.message || "Something went wrong" });
-});
-
-app.use("/api/auth", authRoute);
-app.use("/api/todos", Authenticate, todoRoute);
 
