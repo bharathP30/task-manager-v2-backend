@@ -8,8 +8,8 @@ router.get("/filter", async (req, res) => {
     const filter = { userId: req.userId };
 
     if (category) filter.category = String(category);
-    if (priority) filter.priority= priority;
-    if (completed) filter.completed = completed === "true"; // convert string to boolean
+    if (priority) filter.priority= String(priority);
+    if (completed) filter.completed = String(completed) === "true"; // convert string to boolean
     if (search) filter.taskContent = { $regex: search, $options: "i" }; // case-insensitive search
 
     try {
