@@ -14,8 +14,6 @@ router.get("/filter", async (req, res) => {
 
     try {
         const todos = await Todo.find(filter).sort({ createdAt: -1 });
-        console.log("todos received is, ", todos);
-
         // if (!todos || todos.length === 0) {
         //     return res.status(404).json({ error: "No todos found" });
         // }
