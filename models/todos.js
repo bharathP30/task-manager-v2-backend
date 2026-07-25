@@ -1,27 +1,41 @@
 import mongoose from "mongoose";
 
 const todoSchema = mongoose.Schema({
-    // oId is a temporary client-side ID used for optimistic UI updates; it is not stored in the database
+    
     taskContent: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
+        minLength: 3,
+        maxLength: 100,
     },
 
     category: {
         type: String,
         default: "others",
+        enum: ["work", "school", "personal", "shopping", "others"],
     },
 
     priority: {
         type: String,
         default: "low",
+        enum: ["high", "medium", "low"],
     },
 
-    dueDate: Date,
+    dueDate: {
+        type: Date,
+        default: null,
+        validate: {
+            validator: function(value) {
+                return !value || value >= new Date();
+            },
+            message: "Due date cannot be in the past"
+        }
+    },
 
     completed: {
         type: Boolean,
-        deafault: false,
+        default: false,
     },
 
     userId: {
