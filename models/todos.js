@@ -7,10 +7,22 @@ const todoSchema = mongoose.Schema({
         required: true
     },
 
-    category: String,
-    priority: String,
+    category: {
+        type: String,
+        default: "others",
+    },
+
+    priority: {
+        type: String,
+        default: "low",
+    },
+
     dueDate: Date,
-    completed: Boolean,
+
+    completed: {
+        type: Boolean,
+        deafault: false,
+    },
 
     userId: {
         type: mongoose.Schema.Types.ObjectId,
