@@ -40,7 +40,7 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
     try {
         const { email, password, rememberMe } = req.body;
-        const existingUser = await User.findOne({ email: email });
+        const existingUser = await User.findOne({ email: email }).select("+password");
 
         if (!existingUser) return res.status(401).json({ error: "Invalid email or password" });
 
@@ -57,6 +57,7 @@ router.post("/login", async (req, res) => {
                             token  });
 
     } catch (error) { 
+        console.error("Login error:", error);
         res.status(500).json({ error: "failed to login" });
     }
 });
