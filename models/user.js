@@ -30,6 +30,12 @@ const userSchema = mongoose.Schema({
         required: true,
         minLength: 8,
         select: false, // Exclude password from query results by default
+        validate: {
+            validator: function(value) {
+                return value.length >= 8;
+            },
+            message: "Password must be at least 8 characters long"
+        },
     },
 
     refreshToken: {

@@ -1,5 +1,6 @@
 import Todo from "../models/todos.js";
 import express from "express";
+import { getErrorResponse } from "../utils/errorResponse.js";
 
 const router = express.Router();
 
@@ -65,8 +66,8 @@ router.post("/", async (req, res) => {
 
         return res.status(201).json(newTodo);
     } catch (error) {
-        console.error("POST /api/todos failed:", error);
-        return res.status(500).json({ error: "failed to create todo" });
+        const { status, message } = getErrorResponse(error, "failed to create todo");
+        return res.status(status).json({ error: message });
     }
 });
 
@@ -74,10 +75,18 @@ router.patch("/:id", async (req, res) => {
     try {
         // whitelist data to exclude userId from req body
         const { taskContent, category, priority, dueDate, completed } = req.body;
+        const updateData = {};
+
+        if (typeof taskContent !== "undefined") updateData.taskContent = taskContent;
+        if (typeof category !== "undefined") updateData.category = category;
+        if (typeof priority !== "undefined") updateData.priority = priority;
+        if (typeof dueDate !== "undefined") updateData.dueDate = dueDate;
+        if (typeof completed !== "undefined") updateData.completed = completed;
+
         const toUpdateTodo = await Todo.findOneAndUpdate(
             { userId: req.userId, _id: req.params.id },
-            { $set: { taskContent, category, priority, dueDate, completed } },
-            { returnDocument: 'after' }
+            { $set: updateData },
+            { returnDocument: 'after', runValidators: true }
         );
 
         if (!toUpdateTodo) {
@@ -86,7 +95,8 @@ router.patch("/:id", async (req, res) => {
 
         return res.status(200).json(toUpdateTodo);
     } catch (error) {
-        return res.status(500).json({ error: "failed to update todo" });
+        const { status, message } = getErrorResponse(error, "failed to update todo");
+        return res.status(status).json({ error: message });
     }
 });
 
