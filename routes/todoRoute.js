@@ -65,6 +65,7 @@ router.post("/", async (req, res) => {
 
         return res.status(201).json(newTodo);
     } catch (error) {
+        console.error("POST /api/todos failed:", error);
         return res.status(500).json({ error: "failed to create todo" });
     }
 });
